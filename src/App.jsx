@@ -3,9 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppNavbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import MainContent from "./MainContent";
-import Login from "./components/Login";  
+import Login from "./components/Login";
 import Register from "./components/Register";
 import Favorites from "./components/Favorites";
+import Cart from "./components/Cart"; // Nowa strona koszyka
+import { CartProvider } from "./Context/CartContext"; // Importujemy CartProvider
 
 function App() {
     const [products, setProducts] = useState([]);
@@ -45,30 +47,33 @@ function App() {
     };
 
     return (
-        <Router>
-            <AppNavbar onSearch={handleGlobalSearch} />
-            
-            <div className="container-fluid">
-                <div className="row">
-                    {/* Sidebar (tylko na stronach innych niż logowanie) */}
-                    <div className="col-md-2">
-                        <Sidebar />
-                    </div>
+        <CartProvider> {/* 🔥 Dodajemy globalny CartProvider */}
+            <Router>
+                <AppNavbar onSearch={handleGlobalSearch} />
 
-                    {/* Główna zawartość */}
-                    <div className="col-md-10">
-                        <Routes>
-                            <Route path="/" element={<MainContent products={products} searchResults={searchResults} isSearching={isSearching} userId={currentUserId} />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
-                            
-                            {/* Sprawdzamy, czy użytkownik jest zalogowany przed dodaniem trasy do ulubionych */}
-                            {currentUserId && <Route path="/favorites" element={<Favorites userId={currentUserId} />} />}
-                        </Routes>
+                <div className="container-fluid">
+                    <div className="row">
+                        {/* Sidebar (tylko na stronach innych niż logowanie) */}
+                        <div className="col-md-2">
+                            <Sidebar />
+                        </div>
+
+                        {/* Główna zawartość */}
+                        <div className="col-md-10">
+                            <Routes>
+                                <Route path="/" element={<MainContent products={products} searchResults={searchResults} isSearching={isSearching} userId={currentUserId} />} />
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/register" element={<Register />} />
+                                <Route path="/cart" element={<Cart userId={currentUserId} />} /> {/* 🔥 Strona koszyka */}
+                                
+                                {/* Sprawdzamy, czy użytkownik jest zalogowany przed dodaniem trasy do ulubionych */}
+                                {currentUserId && <Route path="/favorites" element={<Favorites userId={currentUserId} />} />}
+                            </Routes>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </Router>
+            </Router>
+        </CartProvider>
     );
 }
 

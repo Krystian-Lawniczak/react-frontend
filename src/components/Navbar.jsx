@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Navbar, Nav, Form, FormControl, Button, Container } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartShopping, faHeart, faSearch, faUser, faUserPlus, faSignOutAlt } from "@fortawesome/free-solid-svg-icons"; 
+import { faCartShopping, faHeart, faSearch, faUser, faUserPlus, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 
 const AppNavbar = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [user, setUser] = useState(null);
+    const [cartCount, setCartCount] = useState(0);
 
+    // Pobieranie użytkownika z localStorage
     const getUserFromLocalStorage = () => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -20,13 +22,21 @@ const AppNavbar = ({ onSearch }) => {
         return null;
     };
 
+    // Pobieranie liczby produktów w koszyku
+    const getCartCount = () => {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        return cart.reduce((total, item) => total + item.quantity, 0); // Sumowanie ilości produktów
+    };
+
     useEffect(() => {
         setUser(getUserFromLocalStorage());
+        setCartCount(getCartCount());
     }, []);
 
     useEffect(() => {
         const handleStorageChange = () => {
             setUser(getUserFromLocalStorage());
+            setCartCount(getCartCount());
         };
 
         window.addEventListener("storage", handleStorageChange);
@@ -48,7 +58,7 @@ const AppNavbar = ({ onSearch }) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setUser(null);
-        window.location.href = "/"; // 🔥 Po wylogowaniu przekierowanie na stronę główną
+        window.location.href = "/"; // 🔥 Przekierowanie po wylogowaniu
     };
 
     return (
@@ -82,6 +92,7 @@ const AppNavbar = ({ onSearch }) => {
                         )}
                         <Nav.Link href="/cart">
                             Koszyk <FontAwesomeIcon icon={faCartShopping} className="me-2" />
+                            <span className="badge bg-light text-dark">{cartCount}</span>
                         </Nav.Link>
                     </Nav>
                     <Form className="d-flex" onSubmit={handleSearchSubmit}>
