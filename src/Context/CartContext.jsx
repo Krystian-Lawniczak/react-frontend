@@ -1,62 +1,84 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-// Tworzymy kontekst
 const CartContext = createContext();
 
-// Hook do łatwego użycia kontekstu
-export const useCart = () => useContext(CartContext);
-
-// Provider dla całej aplikacji
 export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
 
-    // Pobieranie koszyka z localStorage przy starcie
+    // 🔥 Pobieranie koszyka z LocalStorage przy pierwszym załadowaniu
     useEffect(() => {
-        const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
-        setCartItems(storedCart);
+        const storedCart = localStorage.getItem("cart");
+        if (storedCart) {
+            try {
+                setCartItems(JSON.parse(storedCart));
+                console.log("📥 Wczytano koszyk z localStorage:", JSON.parse(storedCart));
+            } catch (error) {
+                console.error("❌ Błąd parsowania koszyka z localStorage:", error);
+            }
+        }
     }, []);
 
-    // Aktualizacja localStorage po każdej zmianie koszyka
+    // 🔥 Aktualizacja LocalStorage po zmianach w koszyku (z dodatkową walidacją)
     useEffect(() => {
-        localStorage.setItem("cart", JSON.stringify(cartItems));
+        if (cartItems.length > 0) {
+            localStorage.setItem("cart", JSON.stringify(cartItems));
+            console.log("📦 Zapisano koszyk do localStorage:", cartItems);
+        } else {
+            console.warn("⚠️ Koszyk jest pusty, nie zapisuje do localStorage");
+        }
     }, [cartItems]);
 
-    // 🔹 Dodawanie produktu do koszyka
-    const addToCart = (product) => {
-        setCartItems((prevCart) => {
-            const existingItem = prevCart.find((item) => item.id === product.id);
+    // ✅ Dodawanie produktu do koszyka
+    const addToCart = (product, quantity = 1) => {
+        setCartItems((prevItems) => {
+            const existingItem = prevItems.find((item) => item.id === product.id);
+            let newCart;
+
             if (existingItem) {
-                return prevCart.map((item) =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+                newCart = prevItems.map((item) =>
+                    item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
                 );
+            } else {
+                newCart = [...prevItems, { ...product, quantity }];
             }
-            return [...prevCart, { ...product, quantity: 1 }];
+
+            console.log(`🛒 Dodano do koszyka: ${product.name} (ID: ${product.id}), ilość: ${quantity}`);
+            console.log("🛍 Nowy stan koszyka:", newCart);
+            return newCart;
         });
     };
 
-    // 🔹 Usuwanie produktu z koszyka
-    const removeFromCart = (id) => {
-        setCartItems((prevCart) => prevCart.filter((item) => item.id !== id));
+    // ✅ Usuwanie produktu z koszyka
+    const removeFromCart = (productId) => {
+        setCartItems((prevItems) => {
+            const newCart = prevItems.filter((item) => item.id !== productId);
+            console.log(`❌ Usunięto produkt ID: ${productId} z koszyka`);
+            return newCart;
+        });
     };
 
-    // 🔹 Zmiana ilości produktu w koszyku
-    const updateQuantity = (id, quantity) => {
-        if (quantity < 1) return;
-        setCartItems((prevCart) =>
-            prevCart.map((item) => (item.id === id ? { ...item, quantity } : item))
+    // ✅ Aktualizacja ilości produktu w koszyku
+    const updateQuantity = (productId, newQuantity) => {
+        setCartItems((prevItems) =>
+            prevItems.map((item) =>
+                item.id === productId ? { ...item, quantity: newQuantity } : item
+            )
         );
+        console.log(`🔄 Zmieniono ilość produktu ID: ${productId} na ${newQuantity}`);
     };
 
-    // 🔹 Obliczanie całkowitej wartości koszyka
+    // ✅ Obliczanie sumy zamówienia
     const getTotalPrice = () => {
         return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
     };
 
     return (
-        <CartContext.Provider
-            value={{ cartItems, addToCart, removeFromCart, updateQuantity, getTotalPrice }}
-        >
+        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, getTotalPrice }}>
             {children}
         </CartContext.Provider>
     );
+};
+
+export const useCart = () => {
+    return useContext(CartContext);
 };

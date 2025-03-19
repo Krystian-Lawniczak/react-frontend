@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useCart } from "../Context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
@@ -6,6 +6,10 @@ import { Link } from "react-router-dom";
 
 const Cart = () => {
     const { cartItems, removeFromCart, updateQuantity, getTotalPrice } = useCart();
+
+    useEffect(() => {
+        console.log("📥 Koszyk w Cart.jsx:", cartItems);
+    }, [cartItems]);
 
     return (
         <div className="container mt-4">

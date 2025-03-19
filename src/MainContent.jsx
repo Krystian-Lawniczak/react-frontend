@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useCart } from "./Context/CartContext"; // 🔥 Importujemy kontekst koszyka
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faCartPlus } from "@fortawesome/free-solid-svg-icons";
 
 function MainContent({ products, searchResults, isSearching, userId }) {
     const [favorites, setFavorites] = useState([]);
+    const { addToCart } = useCart(); // 🔥 Pobieramy funkcję dodawania do koszyka
 
-    // 🟢 Pobierz ulubione produkty użytkownika przy załadowaniu strony
+    // 🟢 Pobieranie ulubionych produktów użytkownika
     useEffect(() => {
         if (!userId) return;
 
@@ -28,7 +30,7 @@ function MainContent({ products, searchResults, isSearching, userId }) {
                 if (!response.ok) throw new Error(`Błąd pobierania: ${response.status}`);
 
                 const data = await response.json();
-                setFavorites(data.map(fav => fav.id)); // 🟢 Pobieramy ID ulubionych produktów
+                setFavorites(data.map(fav => fav.id));
             } catch (error) {
                 console.error("Błąd pobierania ulubionych:", error);
             }
@@ -76,6 +78,13 @@ function MainContent({ products, searchResults, isSearching, userId }) {
         }
     };
 
+    // 🟢 Dodawanie do koszyka (Lokalne - BEZ backendu)
+    const handleAddToCart = (product) => {
+        addToCart(product, 1); // 🔥 Używa `CartContext`, a nie API!
+        console.log(`✅ Produkt ${product.name} dodany do koszyka!`);
+        alert(`Dodano ${product.name} do koszyka!`);
+    };
+
     return (
         <div className="container mt-4">
             {isSearching ? (
@@ -85,15 +94,23 @@ function MainContent({ products, searchResults, isSearching, userId }) {
                         {searchResults.map((product) => (
                             <div key={product.id} className="col-md-4 mb-3">
                                 <div className="card position-relative">
-                                    <FontAwesomeIcon
-                                        icon={faHeart}
-                                        className={`position-absolute top-0 end-0 m-2 ${favorites.includes(product.id) ? "text-danger" : "text-muted"}`}
-                                        style={{ cursor: "pointer", fontSize: "1.5rem" }}
-                                        onClick={() => toggleFavorite(product.id)}
-                                    />
+                                    <div className="position-absolute top-0 end-0 m-2 d-flex">
+                                        <FontAwesomeIcon
+                                            icon={faHeart}
+                                            className={`me-2 ${favorites.includes(product.id) ? "text-danger" : "text-muted"}`}
+                                            style={{ cursor: "pointer", fontSize: "1.5rem" }}
+                                            onClick={() => toggleFavorite(product.id)}
+                                        />
+                                        <FontAwesomeIcon
+                                            icon={faCartPlus}
+                                            className="text-primary"
+                                            style={{ cursor: "pointer", fontSize: "1.5rem" }}
+                                            onClick={() => handleAddToCart(product)}
+                                        />
+                                    </div>
                                     <div className="card-body">
                                         <h5 className="card-title">{product.name}</h5>
-                                        <p className="card-text">${product.price}</p>
+                                        <p className="card-text">${product.price.toFixed(2)} zł</p>
                                     </div>
                                 </div>
                             </div>
@@ -106,15 +123,23 @@ function MainContent({ products, searchResults, isSearching, userId }) {
                         {products.map((product) => (
                             <div key={product.id} className="col-md-4 mb-3">
                                 <div className="card position-relative">
-                                    <FontAwesomeIcon
-                                        icon={faHeart}
-                                        className={`position-absolute top-0 end-0 m-2 ${favorites.includes(product.id) ? "text-danger" : "text-muted"}`}
-                                        style={{ cursor: "pointer", fontSize: "1.5rem" }}
-                                        onClick={() => toggleFavorite(product.id)}
-                                    />
+                                    <div className="position-absolute top-0 end-0 m-2 d-flex">
+                                        <FontAwesomeIcon
+                                            icon={faHeart}
+                                            className={`me-2 ${favorites.includes(product.id) ? "text-danger" : "text-muted"}`}
+                                            style={{ cursor: "pointer", fontSize: "1.5rem" }}
+                                            onClick={() => toggleFavorite(product.id)}
+                                        />
+                                        <FontAwesomeIcon
+                                            icon={faCartPlus}
+                                            className="text-primary"
+                                            style={{ cursor: "pointer", fontSize: "1.5rem" }}
+                                            onClick={() => handleAddToCart(product)}
+                                        />
+                                    </div>
                                     <div className="card-body">
                                         <h5 className="card-title">{product.name}</h5>
-                                        <p className="card-text">${product.price}</p>
+                                        <p className="card-text">${product.price.toFixed(2)} zł</p>
                                     </div>
                                 </div>
                             </div>
