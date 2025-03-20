@@ -1,15 +1,25 @@
-import React, { useEffect } from "react";
+import React, { useEffect, lazy, Suspense, useCallback } from "react";
 import { useCart } from "../Context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 
+// Lazy Loading komponentu
 const Cart = () => {
     const { cartItems, removeFromCart, updateQuantity, getTotalPrice } = useCart();
 
     useEffect(() => {
         console.log("📥 Koszyk w Cart.jsx:", cartItems);
     }, [cartItems]);
+
+    // Optymalizacja funkcji, aby nie były generowane przy każdym renderze
+    const handleRemoveFromCart = useCallback((id) => {
+        removeFromCart(id);
+    }, [removeFromCart]);
+
+    const handleUpdateQuantity = useCallback((id, newQuantity) => {
+        updateQuantity(id, newQuantity);
+    }, [updateQuantity]);
 
     return (
         <div className="container mt-4">
@@ -33,16 +43,16 @@ const Cart = () => {
                                     <td>{item.name}</td>
                                     <td>{item.price.toFixed(2)} zł</td>
                                     <td>
-                                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="btn btn-sm btn-outline-secondary">
+                                        <button onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)} className="btn btn-sm btn-outline-secondary">
                                             <FontAwesomeIcon icon={faMinus} />
                                         </button>
                                         <span className="mx-2">{item.quantity}</span>
-                                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="btn btn-sm btn-outline-secondary">
+                                        <button onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)} className="btn btn-sm btn-outline-secondary">
                                             <FontAwesomeIcon icon={faPlus} />
                                         </button>
                                     </td>
                                     <td>
-                                        <button onClick={() => removeFromCart(item.id)} className="btn btn-sm btn-danger">
+                                        <button onClick={() => handleRemoveFromCart(item.id)} className="btn btn-sm btn-danger">
                                             <FontAwesomeIcon icon={faTrash} />
                                         </button>
                                     </td>
@@ -57,4 +67,5 @@ const Cart = () => {
     );
 };
 
-export default Cart;
+// Opakowanie w React.memo dla dodatkowej optymalizacji
+export default React.memo(Cart);
