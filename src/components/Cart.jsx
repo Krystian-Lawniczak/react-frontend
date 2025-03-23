@@ -61,6 +61,11 @@ const Cart = () => {
                         </tbody>
                     </table>
                     <h4>💰 Łączna kwota: {getTotalPrice().toFixed(2)} zł</h4>
+                    <div className="mt-4 text-end">
+                        <Link to="/checkout" className="btn btn-success">
+                            Przejdź do zamówienia
+                        </Link>
+                    </div>
                 </>
             )}
         </div>

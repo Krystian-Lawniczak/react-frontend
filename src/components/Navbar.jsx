@@ -1,23 +1,22 @@
-import React, { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Navbar, Nav, Form, FormControl, Button, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-
-// Lazy Loading ikon
-const FontAwesomeIcon = lazy(() => import("@fortawesome/react-fontawesome").then(module => ({ default: module.FontAwesomeIcon })));
-const faCartShopping = lazy(() => import("@fortawesome/free-solid-svg-icons").then(module => ({ default: module.faCartShopping })));
-const faHeart = lazy(() => import("@fortawesome/free-solid-svg-icons").then(module => ({ default: module.faHeart })));
-const faSearch = lazy(() => import("@fortawesome/free-solid-svg-icons").then(module => ({ default: module.faSearch })));
-const faUser = lazy(() => import("@fortawesome/free-solid-svg-icons").then(module => ({ default: module.faUser })));
-const faUserPlus = lazy(() => import("@fortawesome/free-solid-svg-icons").then(module => ({ default: module.faUserPlus })));
-const faSignOutAlt = lazy(() => import("@fortawesome/free-solid-svg-icons").then(module => ({ default: module.faSignOutAlt })));
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faCartShopping,
+    faHeart,
+    faSearch,
+    faUser,
+    faUserPlus,
+    faSignOutAlt
+} from "@fortawesome/free-solid-svg-icons";
 
 const AppNavbar = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [user, setUser] = useState(null);
     const [cartCount, setCartCount] = useState(0);
-    const navigate = useNavigate(); // 🚀 Reactowy sposób przekierowania
+    const navigate = useNavigate();
 
-    // Pobieranie użytkownika z localStorage
     const getUserFromLocalStorage = useCallback(() => {
         try {
             return JSON.parse(localStorage.getItem("user")) || null;
@@ -27,19 +26,16 @@ const AppNavbar = ({ onSearch }) => {
         }
     }, []);
 
-    // Pobieranie liczby produktów w koszyku
     const getCartCount = useCallback(() => {
         const cart = JSON.parse(localStorage.getItem("cart")) || [];
         return cart.reduce((total, item) => total + item.quantity, 0);
     }, []);
 
-    // Ustawienie początkowych wartości
     useEffect(() => {
         setUser(getUserFromLocalStorage());
         setCartCount(getCartCount());
     }, [getUserFromLocalStorage, getCartCount]);
 
-    // Obsługa zmiany localStorage
     useEffect(() => {
         const handleStorageChange = () => {
             setUser(getUserFromLocalStorage());
@@ -63,7 +59,7 @@ const AppNavbar = ({ onSearch }) => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setUser(null);
-        navigate("/"); // 🚀 Przekierowanie po wylogowaniu
+        navigate("/");
     };
 
     return (
@@ -76,27 +72,33 @@ const AppNavbar = ({ onSearch }) => {
                         {!user ? (
                             <>
                                 <Nav.Link href="/login">
-                                    Logowanie <Suspense fallback={<span>...</span>}><FontAwesomeIcon icon={faUser} className="me-2" /></Suspense>
+                                    Logowanie <FontAwesomeIcon icon={faUser} className="me-2" />
                                 </Nav.Link>
                                 <Nav.Link href="/register">
-                                    Zarejestruj się <Suspense fallback={<span>...</span>}><FontAwesomeIcon icon={faUserPlus} className="me-2" /></Suspense>
+                                    Zarejestruj się <FontAwesomeIcon icon={faUserPlus} className="me-2" />
                                 </Nav.Link>
                             </>
                         ) : (
                             <>
                                 <Nav.Link>
-                                    Witaj, {user.name} <Suspense fallback={<span>...</span>}><FontAwesomeIcon icon={faUser} className="me-2" /></Suspense>
+                                    Witaj, {user.name} <FontAwesomeIcon icon={faUser} className="me-2" />
                                 </Nav.Link>
                                 <Nav.Link onClick={handleLogout}>
-                                    Wyloguj <Suspense fallback={<span>...</span>}><FontAwesomeIcon icon={faSignOutAlt} className="me-2" /></Suspense>
+                                    Wyloguj <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
+                                </Nav.Link>
+                                <Nav.Link href="/profile">
+                                    Mój profil <FontAwesomeIcon icon={faUser} className="me-2" />
                                 </Nav.Link>
                                 <Nav.Link href="/favorites">
-                                    Ulubione <Suspense fallback={<span>...</span>}><FontAwesomeIcon icon={faHeart} className="me-2" /></Suspense>
+                                    Ulubione <FontAwesomeIcon icon={faHeart} className="me-2" />
+                                </Nav.Link>
+                                <Nav.Link href="/orders">
+                                    Moje zamówienia <FontAwesomeIcon icon={faCartShopping} className="me-2" />
                                 </Nav.Link>
                             </>
                         )}
                         <Nav.Link href="/cart">
-                            Koszyk <Suspense fallback={<span>...</span>}><FontAwesomeIcon icon={faCartShopping} className="me-2" /></Suspense>
+                            Koszyk <FontAwesomeIcon icon={faCartShopping} className="me-2" />
                             <span className="badge bg-light text-dark">{cartCount}</span>
                         </Nav.Link>
                     </Nav>
@@ -111,7 +113,7 @@ const AppNavbar = ({ onSearch }) => {
                             aria-label="Szukaj"
                         />
                         <Button variant="outline-light" className="ms-2" type="submit">
-                            <Suspense fallback={<span>...</span>}><FontAwesomeIcon icon={faSearch} className="me-2" /></Suspense>
+                            <FontAwesomeIcon icon={faSearch} className="me-2" />
                             Szukaj
                         </Button>
                     </Form>

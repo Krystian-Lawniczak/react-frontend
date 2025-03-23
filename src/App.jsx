@@ -3,14 +3,17 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AppNavbar from "./components/Navbar";
 const CartProvider = lazy(() => import("./Context/CartContext").then(module => ({ default: module.CartProvider })));
 
-
-// Lazy Loading komponentów
 const Sidebar = lazy(() => import("./components/Sidebar"));
 const MainContent = lazy(() => import("./MainContent"));
 const Login = lazy(() => import("./components/Login"));
 const Register = lazy(() => import("./components/Register"));
 const Favorites = lazy(() => import("./components/Favorites"));
 const Cart = lazy(() => import("./components/Cart"));
+const Checkout = lazy(() => import("./components/Checkout"));
+const Orders = lazy(() => import("./components/Orders"));
+const Profile = lazy(() => import("./components/Profile")); // 🧑 Dodajemy profil
+const EditProfile = lazy(() => import("./components/EditProfile")); // 🛠️ Formularz edycji profilu
+const ChangePassword = lazy(() => import("./components/ChangePassword"));
 
 function App() {
     const [products, setProducts] = useState([]);
@@ -18,7 +21,6 @@ function App() {
     const [isSearching, setIsSearching] = useState(false);
     const [currentUserId, setCurrentUserId] = useState(null);
 
-    // Pobieranie użytkownika z localStorage
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser) {
@@ -26,7 +28,6 @@ function App() {
         }
     }, []);
 
-    // Pobieranie produktów z API
     useEffect(() => {
         fetch("http://localhost:8080/api/products")
             .then(response => response.json())
@@ -34,7 +35,6 @@ function App() {
             .catch(error => console.error("Błąd pobierania produktów:", error));
     }, []);
 
-    // Optymalizacja wyszukiwania (useCallback)
     const handleGlobalSearch = useCallback((query) => {
         if (query.trim().length > 0) {
             fetch(`http://localhost:8080/api/products/search?name=${query}`)
@@ -50,13 +50,12 @@ function App() {
     }, []);
 
     return (
-        <CartProvider> {/* 🔥 Globalny CartProvider */}
+        <CartProvider>
             <Router>
                 <AppNavbar onSearch={handleGlobalSearch} />
 
                 <div className="container-fluid">
                     <div className="row">
-                        {/* Lazy Loading dla Sidebar - wykluczamy na stronach logowania i rejestracji */}
                         {window.location.pathname !== "/login" && window.location.pathname !== "/register" && (
                             <div className="col-md-2">
                                 <Suspense fallback={<div>Ładowanie sidebaru...</div>}>
@@ -65,17 +64,24 @@ function App() {
                             </div>
                         )}
 
-                        {/* Główna zawartość */}
                         <div className={window.location.pathname === "/login" || window.location.pathname === "/register" ? "col-md-12" : "col-md-10"}>
                             <Suspense fallback={<div>Ładowanie strony...</div>}>
                                 <Routes>
                                     <Route path="/" element={<MainContent products={products} searchResults={searchResults} isSearching={isSearching} userId={currentUserId} />} />
                                     <Route path="/login" element={<Login />} />
                                     <Route path="/register" element={<Register />} />
-                                    <Route path="/cart" element={<Cart userId={currentUserId} />} /> {/* 🔥 Lazy Loaded Koszyk */}
+                                    <Route path="/cart" element={<Cart userId={currentUserId} />} />
+                                    <Route path="/checkout" element={<Checkout />} />
                                     
-                                    {/* Sprawdzamy, czy użytkownik jest zalogowany przed dodaniem trasy do ulubionych */}
-                                    {currentUserId && <Route path="/favorites" element={<Favorites userId={currentUserId} />} />}
+                                    {currentUserId && (
+                                        <>
+                                            <Route path="/favorites" element={<Favorites userId={currentUserId} />} />
+                                            <Route path="/orders" element={<Orders />} />
+                                            <Route path="/profile" element={<Profile />} />
+                                            <Route path="/edit-profile" element={<EditProfile />} />
+                                            <Route path="/change-password" element={<ChangePassword />} />
+                                        </>
+                                    )}
                                 </Routes>
                             </Suspense>
                         </div>
