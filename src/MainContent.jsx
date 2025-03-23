@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useCart } from "./Context/CartContext"; // 🔥 Importujemy kontekst koszyka
+import { useCart } from "./Context/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faCartPlus } from "@fortawesome/free-solid-svg-icons";
 
 function MainContent({ products, searchResults, isSearching, userId }) {
     const [favorites, setFavorites] = useState([]);
-    const { addToCart } = useCart(); // 🔥 Pobieramy funkcję dodawania do koszyka
+    const { addToCart } = useCart();
 
-    // 🟢 Pobieranie ulubionych produktów użytkownika
     useEffect(() => {
         if (!userId) return;
 
@@ -39,7 +38,6 @@ function MainContent({ products, searchResults, isSearching, userId }) {
         fetchFavorites();
     }, [userId]);
 
-    // 🟢 Obsługa dodawania/usuwania ulubionych
     const toggleFavorite = async (productId) => {
         if (!userId) {
             alert("Musisz być zalogowany, aby dodać do ulubionych!");
@@ -78,11 +76,9 @@ function MainContent({ products, searchResults, isSearching, userId }) {
         }
     };
 
-    // 🟢 Dodawanie do koszyka (Lokalne - BEZ backendu)
     const handleAddToCart = (product) => {
-        addToCart(product, 1); // 🔥 Używa `CartContext`, a nie API!
+        addToCart(product, 1);
         console.log(`✅ Produkt ${product.name} dodany do koszyka!`);
-        alert(`Dodano ${product.name} do koszyka!`);
     };
 
     return (
@@ -95,12 +91,14 @@ function MainContent({ products, searchResults, isSearching, userId }) {
                             <div key={product.id} className="col-md-4 mb-3">
                                 <div className="card position-relative">
                                     <div className="position-absolute top-0 end-0 m-2 d-flex">
-                                        <FontAwesomeIcon
-                                            icon={faHeart}
-                                            className={`me-2 ${favorites.includes(product.id) ? "text-danger" : "text-muted"}`}
-                                            style={{ cursor: "pointer", fontSize: "1.5rem" }}
-                                            onClick={() => toggleFavorite(product.id)}
-                                        />
+                                        {userId && (
+                                            <FontAwesomeIcon
+                                                icon={faHeart}
+                                                className={`me-2 ${favorites.includes(product.id) ? "text-danger" : "text-muted"}`}
+                                                style={{ cursor: "pointer", fontSize: "1.5rem" }}
+                                                onClick={() => toggleFavorite(product.id)}
+                                            />
+                                        )}
                                         <FontAwesomeIcon
                                             icon={faCartPlus}
                                             className="text-primary"
@@ -118,34 +116,34 @@ function MainContent({ products, searchResults, isSearching, userId }) {
                     </div>
                 </>
             ) : (
-                <>
-                    <div className="row d-flex flex-wrap justify-content-start">
-                        {products.map((product) => (
-                            <div key={product.id} className="col-md-4 mb-3">
-                                <div className="card position-relative">
-                                    <div className="position-absolute top-0 end-0 m-2 d-flex">
+                <div className="row d-flex flex-wrap justify-content-start">
+                    {products.map((product) => (
+                        <div key={product.id} className="col-md-4 mb-3">
+                            <div className="card position-relative">
+                                <div className="position-absolute top-0 end-0 m-2 d-flex">
+                                    {userId && (
                                         <FontAwesomeIcon
                                             icon={faHeart}
                                             className={`me-2 ${favorites.includes(product.id) ? "text-danger" : "text-muted"}`}
                                             style={{ cursor: "pointer", fontSize: "1.5rem" }}
                                             onClick={() => toggleFavorite(product.id)}
                                         />
-                                        <FontAwesomeIcon
-                                            icon={faCartPlus}
-                                            className="text-primary"
-                                            style={{ cursor: "pointer", fontSize: "1.5rem" }}
-                                            onClick={() => handleAddToCart(product)}
-                                        />
-                                    </div>
-                                    <div className="card-body">
-                                        <h5 className="card-title">{product.name}</h5>
-                                        <p className="card-text">${product.price.toFixed(2)} zł</p>
-                                    </div>
+                                    )}
+                                    <FontAwesomeIcon
+                                        icon={faCartPlus}
+                                        className="text-primary"
+                                        style={{ cursor: "pointer", fontSize: "1.5rem" }}
+                                        onClick={() => handleAddToCart(product)}
+                                    />
+                                </div>
+                                <div className="card-body">
+                                    <h5 className="card-title">{product.name}</h5>
+                                    <p className="card-text">${product.price.toFixed(2)} zł</p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </>
+                        </div>
+                    ))}
+                </div>
             )}
         </div>
     );

@@ -10,12 +10,13 @@ import {
     faUserPlus,
     faSignOutAlt
 } from "@fortawesome/free-solid-svg-icons";
+import { useCart } from "../Context/CartContext"; // ✅ Kontekst koszyka
 
 const AppNavbar = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [user, setUser] = useState(null);
-    const [cartCount, setCartCount] = useState(0);
     const navigate = useNavigate();
+    const { cartItems, clearCart } = useCart(); // ✅ cartItems z kontekstu
 
     const getUserFromLocalStorage = useCallback(() => {
         try {
@@ -26,41 +27,25 @@ const AppNavbar = ({ onSearch }) => {
         }
     }, []);
 
-    const getCartCount = useCallback(() => {
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
-        return cart.reduce((total, item) => total + item.quantity, 0);
-    }, []);
-
     useEffect(() => {
         setUser(getUserFromLocalStorage());
-        setCartCount(getCartCount());
-    }, [getUserFromLocalStorage, getCartCount]);
-
-    useEffect(() => {
-        const handleStorageChange = () => {
-            setUser(getUserFromLocalStorage());
-            setCartCount(getCartCount());
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        return () => window.removeEventListener("storage", handleStorageChange);
-    }, [getUserFromLocalStorage, getCartCount]);
-
-    const handleSearchChange = (event) => {
-        setSearchTerm(event.target.value);
-    };
-
-    const handleSearchSubmit = (event) => {
-        event.preventDefault();
-        onSearch(searchTerm);
-    };
+    }, [getUserFromLocalStorage]);
 
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        clearCart(); // ✅ czyścimy koszyk
         setUser(null);
-        navigate("/");
+        window.location.reload(); // 🔄 odświeżenie
     };
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        onSearch(searchTerm);
+    };
+
+    // 🔢 dynamiczne zliczanie produktów w koszyku
+    const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     return (
         <Navbar bg="dark" variant="dark" expand="lg" className="mb-3">
@@ -71,30 +56,15 @@ const AppNavbar = ({ onSearch }) => {
                     <Nav className="me-auto">
                         {!user ? (
                             <>
-                                <Nav.Link href="/login">
-                                    Logowanie <FontAwesomeIcon icon={faUser} className="me-2" />
-                                </Nav.Link>
-                                <Nav.Link href="/register">
-                                    Zarejestruj się <FontAwesomeIcon icon={faUserPlus} className="me-2" />
-                                </Nav.Link>
+                                <Nav.Link href="/login">Logowanie <FontAwesomeIcon icon={faUser} className="me-2" /></Nav.Link>
+                                <Nav.Link href="/register">Zarejestruj się <FontAwesomeIcon icon={faUserPlus} className="me-2" /></Nav.Link>
                             </>
                         ) : (
                             <>
-                                <Nav.Link>
-                                    Witaj, {user.name} <FontAwesomeIcon icon={faUser} className="me-2" />
-                                </Nav.Link>
-                                <Nav.Link onClick={handleLogout}>
-                                    Wyloguj <FontAwesomeIcon icon={faSignOutAlt} className="me-2" />
-                                </Nav.Link>
-                                <Nav.Link href="/profile">
-                                    Mój profil <FontAwesomeIcon icon={faUser} className="me-2" />
-                                </Nav.Link>
-                                <Nav.Link href="/favorites">
-                                    Ulubione <FontAwesomeIcon icon={faHeart} className="me-2" />
-                                </Nav.Link>
-                                <Nav.Link href="/orders">
-                                    Moje zamówienia <FontAwesomeIcon icon={faCartShopping} className="me-2" />
-                                </Nav.Link>
+                                <Nav.Link>Witaj, {user.name} <FontAwesomeIcon icon={faUser} className="me-2" /></Nav.Link>
+                                <Nav.Link onClick={handleLogout}>Wyloguj <FontAwesomeIcon icon={faSignOutAlt} className="me-2" /></Nav.Link>
+                                <Nav.Link href="/favorites">Ulubione <FontAwesomeIcon icon={faHeart} className="me-2" /></Nav.Link>
+                                <Nav.Link href="/orders">Moje zamówienia <FontAwesomeIcon icon={faCartShopping} className="me-2" /></Nav.Link>
                             </>
                         )}
                         <Nav.Link href="/cart">
@@ -109,7 +79,7 @@ const AppNavbar = ({ onSearch }) => {
                             className="me-2"
                             style={{ width: "350px" }}
                             value={searchTerm}
-                            onChange={handleSearchChange}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                             aria-label="Szukaj"
                         />
                         <Button variant="outline-light" className="ms-2" type="submit">

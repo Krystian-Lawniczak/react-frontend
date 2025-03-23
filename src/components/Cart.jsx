@@ -21,6 +21,7 @@ const Cart = () => {
         updateQuantity(id, newQuantity);
     }, [updateQuantity]);
 
+    
     return (
         <div className="container mt-4">
             <h2>🛒 Twój Koszyk</h2>

@@ -1,84 +1,78 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const CartContext = createContext();
 
+export const useCart = () => useContext(CartContext);
+
 export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
+    const [isInitialized, setIsInitialized] = useState(false); // ✅
 
-    // 🔥 Pobieranie koszyka z LocalStorage przy pierwszym załadowaniu
+    // 🔁 Wczytanie koszyka z localStorage
     useEffect(() => {
         const storedCart = localStorage.getItem("cart");
         if (storedCart) {
-            try {
-                setCartItems(JSON.parse(storedCart));
-                console.log("📥 Wczytano koszyk z localStorage:", JSON.parse(storedCart));
-            } catch (error) {
-                console.error("❌ Błąd parsowania koszyka z localStorage:", error);
-            }
+            setCartItems(JSON.parse(storedCart));
+            console.log("🛒 Wczytano koszyk z localStorage:", JSON.parse(storedCart));
         }
+        setIsInitialized(true); // ✅ Ustawiamy flagę po załadowaniu
     }, []);
 
-    // 🔥 Aktualizacja LocalStorage po zmianach w koszyku (z dodatkową walidacją)
+    // 💾 Zapisywanie koszyka do localStorage (bez względu na zawartość)
     useEffect(() => {
-        if (cartItems.length > 0) {
+        if (isInitialized) {
             localStorage.setItem("cart", JSON.stringify(cartItems));
-            console.log("📦 Zapisano koszyk do localStorage:", cartItems);
-        } else {
-            console.warn("⚠️ Koszyk jest pusty, nie zapisuje do localStorage");
+            console.log("💾 Zaktualizowano koszyk w localStorage:", cartItems);
         }
-    }, [cartItems]);
+    }, [cartItems, isInitialized]);
 
-    // ✅ Dodawanie produktu do koszyka
-    const addToCart = (product, quantity = 1) => {
-        setCartItems((prevItems) => {
-            const existingItem = prevItems.find((item) => item.id === product.id);
-            let newCart;
-
-            if (existingItem) {
-                newCart = prevItems.map((item) =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+    const addToCart = (product, quantity) => {
+        setCartItems((prev) => {
+            const existing = prev.find((item) => item.id === product.id);
+            if (existing) {
+                return prev.map((item) =>
+                    item.id === product.id
+                        ? { ...item, quantity: item.quantity + quantity }
+                        : item
                 );
-            } else {
-                newCart = [...prevItems, { ...product, quantity }];
             }
-
-            console.log(`🛒 Dodano do koszyka: ${product.name} (ID: ${product.id}), ilość: ${quantity}`);
-            console.log("🛍 Nowy stan koszyka:", newCart);
-            return newCart;
+            return [...prev, { ...product, quantity }];
         });
     };
 
-    // ✅ Usuwanie produktu z koszyka
-    const removeFromCart = (productId) => {
-        setCartItems((prevItems) => {
-            const newCart = prevItems.filter((item) => item.id !== productId);
-            console.log(`❌ Usunięto produkt ID: ${productId} z koszyka`);
-            return newCart;
-        });
+    const removeFromCart = (id) => {
+        setCartItems((prev) => prev.filter((item) => item.id !== id));
     };
 
-    // ✅ Aktualizacja ilości produktu w koszyku
-    const updateQuantity = (productId, newQuantity) => {
-        setCartItems((prevItems) =>
-            prevItems.map((item) =>
-                item.id === productId ? { ...item, quantity: newQuantity } : item
+    const updateQuantity = (id, quantity) => {
+        setCartItems((prev) =>
+            prev.map((item) =>
+                item.id === id ? { ...item, quantity: Math.max(quantity, 1) } : item
             )
         );
-        console.log(`🔄 Zmieniono ilość produktu ID: ${productId} na ${newQuantity}`);
     };
 
-    // ✅ Obliczanie sumy zamówienia
     const getTotalPrice = () => {
-        return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+        return cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    };
+
+    const clearCart = () => {
+        setCartItems([]);
+        console.log("🧹 Koszyk został wyczyszczony");
     };
 
     return (
-        <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity, getTotalPrice }}>
+        <CartContext.Provider
+            value={{
+                cartItems,
+                addToCart,
+                removeFromCart,
+                updateQuantity,
+                getTotalPrice,
+                clearCart,
+            }}
+        >
             {children}
         </CartContext.Provider>
     );
-};
-
-export const useCart = () => {
-    return useContext(CartContext);
 };
