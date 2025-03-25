@@ -11,9 +11,12 @@ const Favorites = lazy(() => import("./components/Favorites"));
 const Cart = lazy(() => import("./components/Cart"));
 const Checkout = lazy(() => import("./components/Checkout"));
 const Orders = lazy(() => import("./components/Orders"));
-const Profile = lazy(() => import("./components/Profile")); // 🧑 Dodajemy profil
-const EditProfile = lazy(() => import("./components/EditProfile")); // 🛠️ Formularz edycji profilu
+const Profile = lazy(() => import("./components/Profile"));
+const EditProfile = lazy(() => import("./components/EditProfile"));
 const ChangePassword = lazy(() => import("./components/ChangePassword"));
+
+// 👇 NOWOŚĆ: Lazy-load dla strony kategorii
+const CategoryPage = lazy(() => import("./components/CategoryPage"));
 
 function App() {
     const [products, setProducts] = useState([]);
@@ -29,11 +32,12 @@ function App() {
     }, []);
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/products")
+        fetch("http://localhost:8080/api/products/random")
             .then(response => response.json())
             .then(data => setProducts(data))
             .catch(error => console.error("Błąd pobierania produktów:", error));
     }, []);
+    
 
     const handleGlobalSearch = useCallback((query) => {
         if (query.trim().length > 0) {
@@ -67,12 +71,22 @@ function App() {
                         <div className={window.location.pathname === "/login" || window.location.pathname === "/register" ? "col-md-12" : "col-md-10"}>
                             <Suspense fallback={<div>Ładowanie strony...</div>}>
                                 <Routes>
-                                    <Route path="/" element={<MainContent products={products} searchResults={searchResults} isSearching={isSearching} userId={currentUserId} />} />
+                                    <Route path="/" element={
+                                        <MainContent
+                                            products={products}
+                                            searchResults={searchResults}
+                                            isSearching={isSearching}
+                                            userId={currentUserId}
+                                        />
+                                    } />
                                     <Route path="/login" element={<Login />} />
                                     <Route path="/register" element={<Register />} />
                                     <Route path="/cart" element={<Cart userId={currentUserId} />} />
                                     <Route path="/checkout" element={<Checkout />} />
-                                    
+
+                                    {/* 🔥 NOWOŚĆ: Trasa kategorii */}
+                                    <Route path="/category/:categoryName" element={<CategoryPage />} />
+
                                     {currentUserId && (
                                         <>
                                             <Route path="/favorites" element={<Favorites userId={currentUserId} />} />

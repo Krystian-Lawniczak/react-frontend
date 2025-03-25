@@ -1,6 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 import '../App.css';
 
 function Sidebar() {
@@ -8,19 +9,19 @@ function Sidebar() {
         <div className="sidebar">
             <ul className="nav flex-column">
                 <li className="nav-item d-flex justify-content-between align-items-center">
-                    <a className="nav-link" href="#">Smartfony</a>
+                    <Link className="nav-link" to="/category/smartfony">Smartfony</Link>
                     <FontAwesomeIcon icon={faChevronRight} className="text-black" />
                 </li>
                 <li className="nav-item d-flex justify-content-between align-items-center">
-                    <a className="nav-link" href="#">Laptopy</a>
+                    <Link className="nav-link" to="/category/laptopy">Laptopy</Link>
                     <FontAwesomeIcon icon={faChevronRight} className="text-black" />
                 </li>
                 <li className="nav-item d-flex justify-content-between align-items-center">
-                    <a className="nav-link" href="#">Drukarki 3D</a>
+                    <Link className="nav-link" to="/category/drukarki">Drukarki 3D</Link>
                     <FontAwesomeIcon icon={faChevronRight} className="text-black" />
                 </li>
                 <li className="nav-item d-flex justify-content-between align-items-center">
-                    <a className="nav-link" href="#">Aparaty</a>
+                    <Link className="nav-link" to="/category/aparaty">Aparaty</Link>
                     <FontAwesomeIcon icon={faChevronRight} className="text-black" />
                 </li>
             </ul>
@@ -29,4 +30,3 @@ function Sidebar() {
 }
 
 export default Sidebar;
-
