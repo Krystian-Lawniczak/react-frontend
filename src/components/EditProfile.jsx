@@ -12,7 +12,7 @@ const EditProfile = () => {
         email: storedUser.email,
         role: storedUser.role || "ROLE_USER",
         enabled: storedUser.enabled ?? true,
-        password: storedUser.password, // 🔥 wymagane przez backend
+        password: storedUser.password, // wymagane przez backend
     });
 
     const [errors, setErrors] = useState({});

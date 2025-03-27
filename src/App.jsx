@@ -15,7 +15,6 @@ const Profile = lazy(() => import("./components/Profile"));
 const EditProfile = lazy(() => import("./components/EditProfile"));
 const ChangePassword = lazy(() => import("./components/ChangePassword"));
 
-// 👇 NOWOŚĆ: Lazy-load dla strony kategorii
 const CategoryPage = lazy(() => import("./components/CategoryPage"));
 
 function App() {
@@ -37,7 +36,6 @@ function App() {
             .then(data => setProducts(data))
             .catch(error => console.error("Błąd pobierania produktów:", error));
     }, []);
-    
 
     const handleGlobalSearch = useCallback((query) => {
         if (query.trim().length > 0) {
@@ -84,13 +82,13 @@ function App() {
                                     <Route path="/cart" element={<Cart userId={currentUserId} />} />
                                     <Route path="/checkout" element={<Checkout />} />
 
-                                    {/* 🔥 NOWOŚĆ: Trasa kategorii */}
-                                    <Route path="/category/:categoryName" element={<CategoryPage />} />
+                               
+                                    <Route path="/category/:categoryName" element={<CategoryPage userId={currentUserId} />} />
 
                                     {currentUserId && (
                                         <>
                                             <Route path="/favorites" element={<Favorites userId={currentUserId} />} />
-                                            <Route path="/orders" element={<Orders />} />
+                                            <Route path="/orders" element={<Orders userId={currentUserId} />} />
                                             <Route path="/profile" element={<Profile />} />
                                             <Route path="/edit-profile" element={<EditProfile />} />
                                             <Route path="/change-password" element={<ChangePassword />} />

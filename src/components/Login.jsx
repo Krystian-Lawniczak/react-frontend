@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const [email, setEmail] = useState("");  // Używamy email zamiast username
+    const [email, setEmail] = useState(""); 
     const [password, setPassword] = useState("");
     const [error, setError] = useState(""); 
     const navigate = useNavigate();  
@@ -17,7 +17,7 @@ const Login = () => {
             const response = await fetch("http://localhost:8080/api/users/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }) // ✅ Wysyłamy `email`, a nie `username`
+                body: JSON.stringify({ email, password }) 
             });
     
             const data = await response.json();

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import MainContent from "../MainContent";
 
-function CategoryPage() {
+function CategoryPage({ userId }) {
     const { categoryName } = useParams();
     const [products, setProducts] = useState([]);
 
@@ -24,7 +24,7 @@ function CategoryPage() {
     return (
         <div className="container mt-4">
             <h3>Kategoria: {categoryName}</h3>
-            <MainContent products={products} isSearching={false} userId={null} />
+            <MainContent products={products} isSearching={false} userId={userId} />
         </div>
     );
 }

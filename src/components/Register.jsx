@@ -3,7 +3,7 @@ import axios from "axios";
 
 const Register = () => {
     const [name, setName] = useState("");
-    const [email, setEmail] = useState(""); // ✅ Dodano email
+    const [email, setEmail] = useState(""); 
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);

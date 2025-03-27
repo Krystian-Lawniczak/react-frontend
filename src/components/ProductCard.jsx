@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useCart } from "./Context/CartContext"; // 🔥 Kontekst koszyka
+import { useCart } from "./Context/CartContext"; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import { Card, Button } from "react-bootstrap";
@@ -9,7 +9,7 @@ const ProductCard = ({ product, userId }) => {
     console.log("📦 Produkt otrzymany przez `ProductCard`:", product);
 
     const [isFavorite, setIsFavorite] = useState(false);
-    const { addToCart } = useCart(); // 🔥 Pobieramy funkcję dodawania do koszyka
+    const { addToCart } = useCart(); 
 
     useEffect(() => {
         if (!userId) return;
@@ -51,7 +51,7 @@ const ProductCard = ({ product, userId }) => {
 
             if (!response.ok) throw new Error(`Błąd: ${response.status}`);
             
-            // Po poprawnym dodaniu/usunięciu ulubionych, odświeżamy stan
+          
             setIsFavorite(!isFavorite);
         } catch (error) {
             console.error("Błąd przy obsłudze ulubionych:", error);

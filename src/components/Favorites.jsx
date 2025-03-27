@@ -36,7 +36,7 @@ function Favorites({ userId, onRemoveFavorite }) {
                 const data = await response.json();
                 console.log("✅ Otrzymane ulubione produkty:", data);
 
-                setFavorites(data); // ✅ Nie potrzebujemy fav.product, API zwraca już gotowe dane
+                setFavorites(data);
             } catch (error) {
                 console.error("❌ Błąd pobierania ulubionych:", error);
                 setError("Nie udało się załadować ulubionych przedmiotów.");
@@ -72,7 +72,7 @@ function Favorites({ userId, onRemoveFavorite }) {
                 prevFavorites.filter((fav) => fav.id !== productId)
             );
 
-            // ✅ Powiadomienie MainContent.jsx, aby zaktualizować serduszka
+            // Powiadomienie MainContent.jsx, aby zaktualizować serduszka
             onRemoveFavorite(productId);
         } catch (error) {
             console.error("❌ Błąd usuwania ulubionego produktu:", error);

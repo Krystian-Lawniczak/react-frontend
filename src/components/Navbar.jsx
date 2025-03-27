@@ -10,13 +10,13 @@ import {
     faUserPlus,
     faSignOutAlt
 } from "@fortawesome/free-solid-svg-icons";
-import { useCart } from "../Context/CartContext"; // ✅ Kontekst koszyka
+import { useCart } from "../Context/CartContext"; 
 
 const AppNavbar = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [user, setUser] = useState(null);
     const navigate = useNavigate();
-    const { cartItems, clearCart } = useCart(); // ✅ cartItems z kontekstu
+    const { cartItems, clearCart } = useCart(); 
 
     const getUserFromLocalStorage = useCallback(() => {
         try {
@@ -34,9 +34,9 @@ const AppNavbar = ({ onSearch }) => {
     const handleLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        clearCart(); // ✅ czyścimy koszyk
+        clearCart(); 
         setUser(null);
-        window.location.reload(); // 🔄 odświeżenie
+        window.location.reload(); 
     };
 
     const handleSearchSubmit = (e) => {
@@ -44,7 +44,7 @@ const AppNavbar = ({ onSearch }) => {
         onSearch(searchTerm);
     };
 
-    // 🔢 dynamiczne zliczanie produktów w koszyku
+  
     const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     return (
@@ -60,12 +60,14 @@ const AppNavbar = ({ onSearch }) => {
                                 <Nav.Link href="/register">Zarejestruj się <FontAwesomeIcon icon={faUserPlus} className="me-2" /></Nav.Link>
                             </>
                         ) : (
-                            <>
-                                <Nav.Link>Witaj, {user.name} <FontAwesomeIcon icon={faUser} className="me-2" /></Nav.Link>
-                                <Nav.Link onClick={handleLogout}>Wyloguj <FontAwesomeIcon icon={faSignOutAlt} className="me-2" /></Nav.Link>
-                                <Nav.Link href="/favorites">Ulubione <FontAwesomeIcon icon={faHeart} className="me-2" /></Nav.Link>
-                                <Nav.Link href="/orders">Moje zamówienia <FontAwesomeIcon icon={faCartShopping} className="me-2" /></Nav.Link>
-                            </>
+<>
+    <Nav.Link className="welcome-text">👋 Witaj, <strong>{user.name}</strong></Nav.Link>
+    <Nav.Link href="/profile">Mój profil <FontAwesomeIcon icon={faUser} className="me-2" /></Nav.Link>
+    <Nav.Link onClick={handleLogout}>Wyloguj <FontAwesomeIcon icon={faSignOutAlt} className="me-2" /></Nav.Link>
+    <Nav.Link href="/favorites">Ulubione <FontAwesomeIcon icon={faHeart} className="me-2" /></Nav.Link>
+    <Nav.Link href="/orders">Moje zamówienia <FontAwesomeIcon icon={faCartShopping} className="me-2" /></Nav.Link>
+</>
+
                         )}
                         <Nav.Link href="/cart">
                             Koszyk <FontAwesomeIcon icon={faCartShopping} className="me-2" />

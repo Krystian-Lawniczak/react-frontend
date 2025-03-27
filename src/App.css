@@ -91,3 +91,14 @@
 .nav-item:hover .nav-link {
   background-color: transparent;
 }
+
+.welcome-text {
+  font-weight: bold;
+  color: #0dcaf0;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  text-shadow: 0 0 3px rgba(0, 174, 255, 0.2);
+  white-space: nowrap;
+}

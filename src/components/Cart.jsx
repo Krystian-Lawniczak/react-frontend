@@ -12,7 +12,6 @@ const Cart = () => {
         console.log("📥 Koszyk w Cart.jsx:", cartItems);
     }, [cartItems]);
 
-    // Optymalizacja funkcji, aby nie były generowane przy każdym renderze
     const handleRemoveFromCart = useCallback((id) => {
         removeFromCart(id);
     }, [removeFromCart]);

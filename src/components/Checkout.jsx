@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useCart } from "../Context/CartContext";
+
 
 const Checkout = () => {
+    const { clearCart } = useCart();
     const [formData, setFormData] = useState({
         fullName: "",
         address: "",
@@ -28,13 +31,22 @@ const Checkout = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         try {
+            const token = localStorage.getItem("token");
+
             const response = await fetch(`http://localhost:8080/api/orders/cart/finalize/${userId}`, {
                 method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
             });
-
+            
+    
             if (response.ok) {
+                clearCart();
                 setOrderPlaced(true);
             } else {
                 console.error("Błąd podczas finalizacji zamówienia");
@@ -43,7 +55,6 @@ const Checkout = () => {
             console.error("Błąd sieci:", error);
         }
     };
-
     if (orderPlaced) {
         return (
             <div className="container mt-4">

@@ -6,19 +6,19 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
-    const [isInitialized, setIsInitialized] = useState(false); // ✅
+    const [isInitialized, setIsInitialized] = useState(false); 
 
-    // 🔁 Wczytanie koszyka z localStorage
+
     useEffect(() => {
         const storedCart = localStorage.getItem("cart");
         if (storedCart) {
             setCartItems(JSON.parse(storedCart));
             console.log("🛒 Wczytano koszyk z localStorage:", JSON.parse(storedCart));
         }
-        setIsInitialized(true); // ✅ Ustawiamy flagę po załadowaniu
+        setIsInitialized(true); 
     }, []);
 
-    // 💾 Zapisywanie koszyka do localStorage (bez względu na zawartość)
+
     useEffect(() => {
         if (isInitialized) {
             localStorage.setItem("cart", JSON.stringify(cartItems));
